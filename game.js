@@ -1,5 +1,5 @@
 // Initialize Phaser, and creates a 400x490px game
-var game = new Phaser.Game(400, 490, Phaser.AUTO, 'game_div');
+var game = new Phaser.Game(500, 500, Phaser.AUTO, 'game_div');
 var game_state = {};
 
 // Creates a new 'main' state that wil contain the game
@@ -20,15 +20,15 @@ game_state.main.prototype = {
 
         velocity_translation = 0;
         velocity_rotation = 0;
-        acceleration_translation = .1;
-        acceleration_rotation = Math.PI / 48;
-        drag_translation_base = 1;
-        drag_translation_percentage = 0.1;
-        drag_translation_base = Math.PI / 32;
-        drag_translation_percentage = 0.1;
+        acceleration_translation = 1;
+        acceleration_rotation = Math.PI / 64;
+        drag_translation_base = .1;
+        drag_translation_percentage = 0.01;
+        drag_rotation_base = Math.PI / 128;
+        drag_rotation_percentage = 0.01;
 
-        max_velocity_translation = 20;
-        max_velocity_rotation = Math.PI * 2;
+        max_velocity_translation = 15;
+        max_velocity_rotation = Math.PI / 32;
         max_acceleration_translation = 20;
         max_acceleration_rotation = Math.PI / 2;
     },
@@ -57,16 +57,26 @@ game_state.main.prototype = {
             velocity_translation -= velocity_translation * drag_translation_percentage - drag_translation_base;
         }
         if (get_sign(velocity_translation) != sign)
+            velocity_translation = 0;*/
+        // Simpler drag for the moment
+        sign = get_sign(velocity_translation);
+        velocity_translation += -sign * (drag_translation_base + drag_translation_percentage * velocity_translation);
+        if (sign != get_sign(velocity_translation) && velocity_translation != 0)
             velocity_translation = 0;
 
-        /// Limits
-        sign = get_sign(acceleration_translation);
-        if (sign * acceleration_translation < max_acceleration_translation)
-            acceleration_translation = sign * max_acceleration_translation;
+        sign = get_sign(velocity_rotation);
+        velocity_rotation += -sign * (drag_rotation_base + drag_rotation_percentage * velocity_rotation);
+        if (sign != get_sign(velocity_rotation) && velocity_rotation != 0)
+            velocity_rotation = 0;
 
-        sign = get_sign(acceleration_rotation);
-        if (sign * acceleration_rotation < max_acceleration_rotation)
-            acceleration_rotation = sign * max_acceleration_rotation;*/
+        /// Limits
+        sign = get_sign(velocity_translation);
+        if (Math.abs(velocity_translation) > max_velocity_translation)
+            velocity_translation = sign * max_velocity_translation;
+
+        sign = get_sign(velocity_rotation);
+        if (Math.abs(velocity_rotation) > max_velocity_rotation)
+            velocity_rotation = sign * max_velocity_rotation;
 
         /// Update
         // Rotation
@@ -76,12 +86,21 @@ game_state.main.prototype = {
         ship.position.y += Math.sin(ship.rotation) * velocity_translation;
         ship.position.x += Math.cos(ship.rotation) * velocity_translation;
 
-        console.log("v_tra:", velocity_translation, "a_tra", acceleration_translation, "v_rot", velocity_rotation, "a_rot", acceleration_rotation);
-    },
+        /// Boundaries
+        size = ship.getBounds()
+        // Width
+        if (ship.position.x > game.width + ship.width / 2)
+            ship.position.x = -ship.width / 2 + 1;
+        else if (ship.position.x < -ship.width / 2)
+            ship.position.x = game.width + ship.width / 2 - 1;
+        // Height
+        if (ship.position.y > game.height + ship.height / 2)
+            ship.position.y = -ship.height / 2 + 1;
+        else if (ship.position.y < -ship.height / 2)
+            ship.position.y = game.height + ship.height / 2 - 1;
 
-    render: function () {
-        game.debug.spriteInfo(ship, 32, 100);
-    }
+        console.log("v", velocity_translation, "r", velocity_rotation)
+    },
 
 };
 
