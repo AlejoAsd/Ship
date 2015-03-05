@@ -51,14 +51,6 @@ game_state.main.prototype = {
             velocity_rotation += acceleration_rotation;
 
         // Drag
-        /*sign = get_sign(velocity_translation);
-        if (velocity_translation != 0)
-        {
-            velocity_translation -= velocity_translation * drag_translation_percentage - drag_translation_base;
-        }
-        if (get_sign(velocity_translation) != sign)
-            velocity_translation = 0;*/
-        // Simpler drag for the moment
         sign = get_sign(velocity_translation);
         velocity_translation += -sign * (drag_translation_base + drag_translation_percentage * velocity_translation);
         if (sign != get_sign(velocity_translation) && velocity_translation != 0)
@@ -98,8 +90,6 @@ game_state.main.prototype = {
             ship.position.y = -ship.height / 2 + 1;
         else if (ship.position.y < -ship.height / 2)
             ship.position.y = game.height + ship.height / 2 - 1;
-
-        console.log("v", velocity_translation, "r", velocity_rotation)
     },
 
 };
