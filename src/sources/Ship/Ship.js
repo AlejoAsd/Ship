@@ -87,7 +87,7 @@ Ship = function (game, x, y, sprite, controls)
 	        if (this.keyPressed(this.controls.up))
 	            this.velocity.magnitude += this.velocity.acceleration * elapsed;
 	        else if (this.keyPressed(this.controls.down))
-	            this.velocity.magnitude += this.velocity.acceleration * elapsed;
+	            this.velocity.magnitude -= this.velocity.acceleration * elapsed;
 	        else
 	        	va = false;
 
